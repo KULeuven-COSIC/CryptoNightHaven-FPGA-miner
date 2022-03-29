@@ -1,0 +1,1 @@
+# CryptoNightHaven-FPGA-miner
