@@ -1,0 +1,7 @@
+build
+# run
+.Xil
+.run
+.ipcache
+.vscode
+*.log
