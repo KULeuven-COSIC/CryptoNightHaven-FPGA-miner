@@ -2,7 +2,7 @@
 
 This repository presents our work-in-progress towards a CryptoNight Haven [Varium C1100](https://www.xilinx.com/content/dam/xilinx/publications/product-briefs/varium-c1100-product-brief.pdf) FPGA-miner. This project was undertaken in the context of the Xilinx 2021 Adaptive Computing Challenge.  
 
-:warning: The project is still work-in-progress. The miner is unfortunately not functional.
+:warning: The project is still work-in-progress. The miner is unfortunately not functional yet. The miner works in hardware emulation and RTL simulation. In an actual hardware run, results for a 4 MB scratchpad are inconsistent with software-generated testvectors.
 
 
 ## Setup
