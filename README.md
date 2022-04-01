@@ -4,7 +4,6 @@ This repository presents our work-in-progress towards a CryptoNight Haven [Variu
 
 :warning: The project is still work-in-progress. The miner is unfortunately not functional yet. The miner works in hardware emulation and RTL simulation. In an actual hardware run, results for a 4 MB scratchpad are inconsistent with software-generated testvectors.
 
-
 ## Setup
 
 Our project uses a similar setup to the `rtl_kernels` in the [Vitis Accel Examples Repostiory](https://github.com/Xilinx/Vitis_Accel_Examples/tree/master/rtl_kernels). Have a look at the latest Xilinx documentation on [compiling and executing](https://xilinx.github.io/Vitis_Accel_Examples/2021.2/html/compile_execute.html).
@@ -16,11 +15,12 @@ The top-level `Makefile` defines several targets for execution. Use
 ```make
 make help
 ```
+
 for further info.
 
 ## Execution
 
-Execution is controlled through the `Makefile`. After execution finishes, the software will print out 8 Control and Status Registers ( `CSR[7:0]` ). These registers collect information on the hardware execution:
+Execution is controlled through the `Makefile`. Default software execution is designed to test and profile our CryptoNight Haven RTL kernel. After execution finishes, the software will print out 8 Control and Status Registers ( `CSR[7:0]` ). These registers collect information on the hardware execution:
 
 ```verilog
  csr0_to_sw <= {cn_counter[15:0] , pre_counter[15:0] };
@@ -33,7 +33,6 @@ Execution is controlled through the `Makefile`. After execution finishes, the so
  csr7_to_sw <= m02_axi_r_counter;
 ```
 
-
 - `pre_counter`: amount of block header data (with differing nonces) fed to `pre_cn` (initial `keccak`) module
 - `cn_counter`: amount of data passed from `pr_cn` to `cn`
 - `post_counter`: amount of data passed from `cn` to `final_hashes`
@@ -41,26 +40,28 @@ Execution is controlled through the `Makefile`. After execution finishes, the so
 - `cycle_counter`: the number of clock ticks between `start` and `exit`
 - `latency`: the number of clock ticks between `start` to first `cn_output`
 - `m0{x}_axi_{r,w}_counter`: ammount of axi transactions handled:
-  - `m00_axi_w_counter `for explode, writing the scratch pad data to memory. write-only in bursts
+  - `m00_axi_w_counter`for explode, writing the scratch pad data to memory. write-only in bursts
   - `m01_axi_w_counter` and `m01_axi_r_counter` for shuffle operations. one beat (not burst) read and write operations.
   - `m02_axi_2_counter` for implode, reading the final state of the scratch pad memory. read-only in bursts.
 
+## XMRig Miner Integration
 
+We provide a [host-side patch](./src/xmrig/xilinx_adoption.patch) to [XMRig](https://github.com/xmrig/xmrig), an open-source cross platform miner that supports CryptoNight Haven. This patch is designed to integrate the RTL kernel directly into the host-side miner using XRT APIs.
+
+:warning: This patch is designed to give a general idea of the steps required to integrate the FPGA miner. As miner the miner is not functional yet, the host-side interface is not finalized and the adoption patch is currently untested.
 
 ## Additional Information: Project Structure
 
- - `build`: contains the `.xo` and `.xclbin` files as well as all the
+- `build`: contains the `.xo` and `.xclbin` files as well as all the
    files from compiling and synthesizing the design. Vivado makes a
    tmp project while packaging, it is useful to keep this for debugging
    purposes.
 - `common`: include files
- - `package`: contains the config files for `v++`. 
-   - `cfg/*.cfg`: connect kernels to each other and to memory. 
-   - `scripts/package.tcl`: packaging script
-   - `config.mk` : makefile configurations
- - `run`: contains simulation/emulation results and the compiled host
-   application. 
- - `src`: contains source files for the host, the rtl kernels, as well as tcl
+- `package`: contains the config files for `v++`.
+  - `cfg/*.cfg`: connect kernels to each other and to memory.
+  - `scripts/package.tcl`: packaging script
+  - `config.mk` : makefile configurations
+- `run`: contains simulation/emulation results and the compiled host
+   application.
+- `src`: contains source files for the host, the rtl kernels, as well as tcl
    scripts for packaging them.
-
-
